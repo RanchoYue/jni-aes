@@ -59,10 +59,7 @@ AES_KEY *getAesKey() {
     return aes_key;
 }
 
-
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_example_aes_TestJNI_encrypt(JNIEnv *env, jobject instance, jstring plainText) {
+jstring aes_encrypt(JNIEnv *env, jclass instance, jstring plainText) {
     bool newLine = false;
     const char *inChars = (env->GetStringUTFChars(plainText, JNI_FALSE));
     const size_t originalLength = strlen(inChars);
@@ -91,6 +88,25 @@ Java_com_example_aes_TestJNI_encrypt(JNIEnv *env, jobject instance, jstring plai
     return tmp;
 }
 
+static JNINativeMethod gMethods[] = {
+        {"encrypt", "(Ljava/lang/String;)Ljava/lang/String;", (void *) aes_encrypt}
+};
+
+int JNI_OnLoad(JavaVM *vm, void *re) {
+    JNIEnv *env;
+    if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+        return JNI_ERR;
+    }
+
+    jclass javaClass = env->FindClass("com/example/aes/TestJNI");
+    if (javaClass == NULL) {
+        return JNI_ERR;
+    }
+    if (env->RegisterNatives(javaClass, gMethods, sizeof(gMethods) / sizeof(gMethods[0])) < 0) {
+        return JNI_ERR;
+    }
+    return JNI_VERSION_1_6;
+}
 
 extern "C"
 JNIEXPORT void JNICALL

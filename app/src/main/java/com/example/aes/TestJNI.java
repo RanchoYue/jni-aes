@@ -8,7 +8,7 @@ public class TestJNI {
 
     public static native void log();
 
-    public native String encrypt(String plainText);
+    public static native String encrypt(String plainText);
 
     public native String decrypt(String cipherText);
 
